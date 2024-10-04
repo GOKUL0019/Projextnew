@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tamil Movie Recommendations</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #1c1c1e;
+            color: white;
+            padding: 20px;
+        }
+
+        .navbar {
+            background-color: #333;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            color: #FFD700;
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .navbar ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        .navbar ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+
+        .navbar ul li a:hover {
+            color: #ffd700;
+        }
+
+        .movie-card {
+            background-color: #444;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.05);
+        }
+
+        img {
+            max-width: 100%;
+            border-radius: 5px;
+        }
+
+        .watchlist-btn {
+            background-color: #FFD700;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: background-color 0.3s ease;
+        }
+
+        .watchlist-btn:hover {
+            background-color: #ffcc00;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .page-number {
+            margin: 0 5px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border: 1px solid #fff;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .page-number:hover {
+            background-color: #333;
+        }
+
+        .active {
+            background-color: #FFD700;
+            color: black;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #ccc;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>Home</h1>
+        <ul>
+            <li><a href="watchlist.html">Watchlist</a></li>
+            <li><a href="reviews.html">Reviews</a></li>
+            <li><a href="login.html">Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Header Section -->
+    <header style="text-align: center; padding: 20px;">
+        <h1 style="font-size: 36px; color: #FFD700; text-shadow: 2px 2px #000;">Tamil Movie Recommendations</h1>
+        <input type="text" id="search-bar" placeholder="Search for a movie..." 
+               style="padding: 10px; width: 300px; border-radius: 5px; border: none; margin-bottom: 20px;"
+               onkeyup="filterMovies()"/>
+    </header>
+
+    <!-- Genre Filter Section -->
+    <section style="text-align: center; padding: 10px;">
+        <label for="genre" style="font-size: 18px; color: #FFD700;">Filter by Genre: </label>
+        <select id="genre" style="padding: 10px; border-radius: 5px; background-color: #444; color: white;" onchange="filterMovies()">
+            <option value="All">All</option>
+            <option value="Action">Action</option>
+            <option value="Drama">Drama</option>
+            <option value="Comedy">Comedy</option>
+            <option value="Thriller">Thriller</option>
+            <option value="Sci-Fi">Sci-Fi</option>
+        </select>
+    </section>
+
+    <!-- Movie Grid Section -->
+    <section id="movie-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; padding: 20px;">
+        <!-- Movie Cards will be dynamically added here -->
+    </section>
+
+    <!-- Pagination Section -->
+    <div class="pagination" id="pagination"></div>
+
+    <!-- Footer Section -->
+    <footer>
+        <p>&copy; 2024 TamilCinemaHub. All Rights Reserved.</p>
+    </footer>
+
+    <!-- Inline JavaScript -->
+    <script>
+        const movies = [
+        { title: "Jailer", genre: "Action", rating: 8.0, poster: "https://moviegalleri.net/wp-content/uploads/2022/08/Rajinikanth-Jailer-Movie-First-Look-Poster-HD.jpg", releaseYear: 2023 },
+            { title: "Viduthalai", genre: "Drama", rating: 7.5, poster: "https://wallpapercave.com/wp/wp12229469.jpg", releaseYear: 2023 },
+            { title: "Maamannan", genre: "Thriller", rating: 8.2, poster: "https://wallpapercave.com/wp/wp12678969.jpg", releaseYear: 2023 },
+            { title: "Thunivu", genre: "Action", rating: 7.9, poster: "https://wallpaperaccess.com/full/8641997.jpg", releaseYear: 2023 },
+            { title: "Don", genre: "Comedy", rating: 7.4, poster: "https://www.fulloncinema.in/wp-content/uploads/2022/05/Don_1_vlmfaxfeceaea-e1652411222576.jpeg", releaseYear: 2023 },
+            { title: "Varisu", genre: "Drama", rating: 8.3, poster: "https://m.media-amazon.com/images/M/MV5BYzQ1NmM3NTktY2RmMS00NzgxLWFiZjktM2JjYzY5N2IxNmIzXkEyXkFqcGdeQXVyMTMzNzIyNDc1._V1_FMjpg_UX1000_.jpg", releaseYear: 2023 },
+            { title: "Sivaji", genre: "Action", rating: 8.5, poster: "https://wallpapercave.com/wp/wp7845450.jpg", releaseYear: 2007 },
+            { title: "Kabali", genre: "Drama", rating: 8.1, poster: "https://m.media-amazon.com/images/M/MV5BYmY3MWIzMDgtMjFiMi00NTFjLWFlZWQtMjlhOThiNjEyNWU4XkEyXkFqcGdeQXVyODIwMDI1NjM@._V1_FMjpg_UX1000_.jpg", releaseYear: 2016 },
+            { title: "Petta", genre: "Action", rating: 7.9, poster: "https://wallpapercave.com/wp/wp8272583.jpg", releaseYear: 2019 },
+            { title: "Kaithi", genre: "Thriller", rating: 8.4, poster: "https://m.media-amazon.com/images/M/MV5BZjQyNThhMjQtZDgzNC00N2U4LWFhNjMtNWVlMzIxNWIxNTUwXkEyXkFqcGdeQXVyMTYyNjAzOTUx._V1_.jpg", releaseYear: 2019 },
+            { title: "Master", genre: "Action", rating: 7.8, poster: "https://wallpapercave.com/wp/wp5731716.jpg", releaseYear: 2021 },
+            { title: "Vikram", genre: "Action", rating: 8.1, poster: "https://wallpaperaccess.com/full/8412315.jpg", releaseYear: 2022 },
+            { title: "KGF", genre: "Thriller", rating: 8.7, poster: "https://wallpaperaccess.com/full/1132645.jpg", releaseYear: 2022 },
+            { title: "Sulthan", genre: "Drama", rating: 7, poster: "https://wallpapercave.com/wp/wp8812707.jpg", releaseYear: 2021 },
+            { title: "RRR", genre: "Action", rating: 8.4, poster: "https://www.filmibeat.com/ph-big/2021/06/rrr_16249644106.jpg", releaseYear: 2022 },
+            { title: "Pushpa: The Rise", genre: "Action", rating: 7.6, poster: "https://e0.pxfuel.com/wallpapers/778/185/desktop-wallpaper-pushpa-the-rise-movie-10-impressive-promotional-posters-of-allu-arjun-s-pushpa-the-rise-times-of-india-pushpa-movie.jpg", releaseYear: 2021 },
+            { title: "Doctor", genre: "Comedy", rating: 7.6, poster: "https://moviegalleri.net/wp-content/uploads/2020/02/Actor-Sivakarthikeyan-Doctor-First-Look-Poster-HD.jpg", releaseYear: 2021 },
+            { title: "Jai Bhim", genre: "Drama", rating: 9.3, poster: "https://i0.wp.com/www.newsbugz.com/wp-content/uploads/2021/07/jai-bhim-movie.jpg?resize=682,1024&ssl=1", releaseYear: 2021 },
+            { title: "Soorarai Pottru", genre: "Drama", rating: 9.1, poster: "https://wallpaperaccess.com/full/3669758.jpg", releaseYear: 2020 },
+            { title: "Theri", genre: "Action", rating: 7.5, poster: "https://www.filmibeat.com/fanimg/theri-photos-images-40690.jpg", releaseYear: 2016 },
+            { title: "Enthiran", genre: "Action", rating: 7.1, poster: "https://images.fandango.com/ImageRenderer/0/0/redesign/static/img/default_poster.png/0/images/masterrepository/Fandango/137816/Poster-of-Enthiranfinal.jpg", releaseYear: 2010 },
+            { title: "Mersal", genre: "Thriller", rating: 7.8, poster: "http://www.atozpictures.com/uploads/2017/08/mersal-vijay-wallpapers.jpg", releaseYear: 2017 },
+            { title: "Annaatthe", genre: "Drama", rating: 6.8, poster: "https://www.cinejosh.com/newsimg/newsmainimg/rajinikanth-shows-power-in-a-traditional-avatar_b_1009210709.jpg", releaseYear: 2021 },
+            { title: "Vikram Vedha", genre: "Thriller", rating: 8.5, poster: "http://moviegalleri.net/wp-content/uploads/2017/02/Actor-Madhavan-Vijay-Sethupathi-starring-Vikram-Vedha-Movie-First-Look-Poster.jpg", releaseYear: 2017 },
+            { title: "Manithan", genre: "Drama", rating: 7.9, poster: "https://images-na.ssl-images-amazon.com/images/S/pv-target-images/4344b73b80323f97410c9c38435899ad01da27b50720e025dd2637409d39d61e._RI_V_TTW_.jpg", releaseYear: 2016 },
+            { title: "Veeram", genre: "Action", rating: 7.1, poster: "https://upload.wikimedia.org/wikipedia/en/e/ec/Veeram_2014_poster.jpg", releaseYear: 2014 },
+            { title: "Viswasam", genre: "Action", rating: 7.6, poster: "https://wallpapercave.com/wp/wp7119936.jpg", releaseYear: 2019 },
+            { title: "Vivegam", genre: "Thriller", rating: 6.7, poster: "https://2.bp.blogspot.com/-o3eC688XRMM/WRRCHv-YygI/AAAAAAAAivo/IHhxK_-5qls80e5026-CnB5LBzC4Lv-1wCLcB/s1600/Vivegam-First-Look-1.jpg", releaseYear: 2017 },
+            { title: "Darbar", genre: "Action", rating: 6.4, poster: "https://i2.wp.com/www.socialnews.xyz/wp-content/uploads/2020/02/22/Rajinikanths-Darbar-is-now-streaming-on-Amazon-Prime-Video-2.jpg?fit=1920%2C2560&quality=90&zoom=1&ssl=1", releaseYear: 2020 },
+            { title: "2.0", genre: "Sci-Fi", rating: 7, poster: "https://files.prokerala.com/movies/pics/450w/rajinikanth-shankar-s-2-point-o-teaser-announcement-93757.jpg", releaseYear: 2018 },
+            { title: "Aadukalam", genre: "Action", rating: 8.3, poster: "https://wallpapercave.com/wp/wp7126576.jpg", releaseYear: 2011 },
+            { title: "Soodhu Kavvum", genre: "Comedy", rating: 8.4, poster: "https://mir-s3-cdn-cf.behance.net/project_modules/max_1200/629c3296281711.5eaab786174ba.jpg", releaseYear: 2013 },
+            { title: "Karnan", genre: "Drama", rating: 8.6, poster: "https://static.moviecrow.com/gallery/20210322/184438-ExEMuw0XMAEee8j.jfif", releaseYear: 2021 },
+            { title: "Nayakan", genre: "Thriller", rating: 8.6, poster: "https://m.media-amazon.com/images/M/MV5BMGYyZDk0M2EtYjk0MC00ZTI4LTllMTAtMWIyMTE0MGViM2QwXkEyXkFqcGdeQXVyODEzOTQwNTY@._V1_FMjpg_UX1000_.jpg", releaseYear: 1987 },
+            { title: "Ponniyin Selvan: Part 1", genre: "Historical Drama", rating: 7.9, poster: "https://m.media-amazon.com/images/M/MV5BN2FkZDBkNzItMzQyOC00Mjc2LTg5MTMtOTJkNzgxZmZkOTdhXkEyXkFqcGdeQXVyMTMzNzIxNzkw._V1_.jpg", releaseYear: 2022 },
+            { title: "KGF: Chapter 2", genre: "Action", rating: 8.6, poster: "https://wallpapercave.com/wp/wp10472241.jpg", releaseYear: 2022 },
+            { title: "Vada Chennai", genre: "Crime", rating: 8.5, poster: "https://m.media-amazon.com/images/M/MV5BZGM4NDBkOTAtMzgxNi00MDA5LWExZTAtNTNkNzA1ZDFhYzA2XkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_.jpg", releaseYear: 2018 },
+            { title: "Kaala", genre: "Action", rating: 7.6, poster: "https://m.media-amazon.com/images/M/MV5BZjAyNTFjZTYtOWU3YS00NjI5LWE2OTItYzRlZDRiYTMxMGNkXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_.jpg", releaseYear: 2018 },
+            { title: "Asuran", genre: "Action", rating: 8.5, poster: "https://m.media-amazon.com/images/M/MV5BMGQzMjRmNzktNWM2NS00YjkwLTg0YTgtM2JjYWI5MjUwNTRmXkEyXkFqcGdeQXVyODExNTExMTM@._V1_FMjpg_UX1000_.jpg", releaseYear: 2019 }
+
+        ];
+
+        let currentPage = 1;
+        const itemsPerPage = 18;
+
+        function displayMovies(page, genreFilter = "All", searchTerm = "") {
+            const movieGrid = document.getElementById("movie-grid");
+            movieGrid.innerHTML = "";
+
+            // Filter by genre and search term
+            const filteredMovies = movies.filter(movie => {
+                const matchesGenre = genreFilter === "All" || movie.genre === genreFilter;
+                const matchesSearch = movie.title.toLowerCase().includes(searchTerm.toLowerCase());
+                return matchesGenre && matchesSearch;
+            });
+
+            // Pagination logic
+            const startIndex = (page - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, filteredMovies.length);
+            const paginatedMovies = filteredMovies.slice(startIndex, endIndex);
+
+            paginatedMovies.forEach(movie => {
+                const movieCard = document.createElement("div");
+                movieCard.classList.add("movie-card");
+                movieCard.innerHTML = `
+                    <div style="background-color: #333; padding: 20px; border-radius: 10px; text-align: center; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);">
+                        <img src="${movie.poster}" alt="${movie.title}" style="width: 150px; height: 220px; border-radius: 10px; object-fit: cover;">
+                        <h3 style="color: #FFD700;">${movie.title}</h3>
+                        <p style="color: #ccc;">Genre: ${movie.genre}</p>
+                        <p style="color: #FFD700;">IMDb Rating: ${movie.rating}</p>
+                        <p style="color: #ccc;">Release Year: ${movie.releaseYear}</p>
+                        <button style="padding: 10px 20px; border: none; background-color: #FFD700; color: black; cursor: pointer;" onclick="addToWatchlist('${movie.title}')">Add to Watchlist</button>
+                    </div>                `;
+
+                movieGrid.appendChild(movieCard);
+            });
+
+            setupPagination(filteredMovies.length, page);
+        }
+
+        function setupPagination(totalItems, currentPage) {
+            const paginationDiv = document.getElementById("pagination");
+            paginationDiv.innerHTML = "";
+
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageNumber = document.createElement("span");
+                pageNumber.classList.add("page-number");
+                if (i === currentPage) {
+                    pageNumber.classList.add("active");
+                }
+                pageNumber.textContent = i;
+                pageNumber.onclick = () => {
+                    displayMovies(i, document.getElementById("genre").value, document.getElementById("search-bar").value);
+                };
+                paginationDiv.appendChild(pageNumber);
+            }
+        }
+
+        function addToWatchlist(movieTitle) {
+            let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+            if (!watchlist.includes(movieTitle)) {
+                watchlist.push(movieTitle);
+                localStorage.setItem("watchlist", JSON.stringify(watchlist));
+                alert(`${movieTitle} has been added to your watchlist!`);
+            } else {
+                alert(`${movieTitle} is already in your watchlist.`);
+            }
+        }
+
+        function filterMovies() {
+            const searchTerm = document.getElementById("search-bar").value;
+            const genreFilter = document.getElementById("genre").value;
+            displayMovies(1, genreFilter, searchTerm);
+        }
+
+        // Initial display
+        displayMovies(currentPage);
+    </script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watchlist</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #1c1c1e;
+            color: white;
+            padding: 20px;
+        }
+        
+        .navbar {
+            background-color: #333;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar h1 {
+            color: #FFD700;
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .navbar ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        .navbar ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+
+        .navbar ul li a:hover {
+            color: #ffd700; /* Change to desired hover color */
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+        }
+
+        h2 {
+            color: #FFD700;
+            text-shadow: 2px 2px #000;
+        }
+
+        #movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .movie-card {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .movie-card img {
+            width: 150px;
+            height: 220px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .movie-card h3 {
+            color: #FFD700;
+        }
+
+        .movie-card p {
+            color: #ccc;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>Watchlist</h1>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            
+            <li><a href="reviews.html">Reviews</a></li>
+            <li><a href="login.html">Logout</a></li>
+        </ul>
+    </div>
+
+    <header>
+        <h2>Your Watchlist</h2>
+    </header>
+
+    <section id="movie-grid">
+        <!-- Movie cards will be dynamically added here -->
+    </section>
+
+    <footer>
+        <p>&copy; 2024 TamilCinemaHub. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // Function to display watchlist movies
+        function displayWatchlist() {
+            const watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+            const movieGrid = document.getElementById("movie-grid");
+            movieGrid.innerHTML = ""; // Clear previous movie cards
+
+            if (watchlist.length === 0) {
+                movieGrid.innerHTML = '<p style="color: #ccc;">Your watchlist is empty.</p>';
+                return;
+            }
+
+            watchlist.forEach(movieTitle => {
+                const movieCard = `
+                    <div class="movie-card">
+                        <h3>${movieTitle}</h3>
+                        <button style="padding: 10px 20px; border: none; background-color: #FFD700; color: black; cursor: pointer;" onclick="removeFromWatchlist('${movieTitle}')">Remove from Watchlist</button>
+                    </div>
+                `;
+                movieGrid.innerHTML += movieCard;
+            });
+        }
+
+        // Function to remove a movie from watchlist
+        function removeFromWatchlist(movieTitle) {
+            let watchlist = JSON.parse(localStorage.getItem("watchlist")) || [];
+            watchlist = watchlist.filter(title => title !== movieTitle);
+            localStorage.setItem("watchlist", JSON.stringify(watchlist));
+            displayWatchlist(); // Refresh the watchlist display
+            alert(`${movieTitle} removed from your watchlist!`);
+        }
+
+        // Initial watchlist display
+        displayWatchlist();
+    </script>
+</body>
+</html>

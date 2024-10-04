@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Reviews</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1c1c1e;
+            color: white;
+            padding: 20px;
+        }
+        .navbar {
+            background-color: #333;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar h1 {
+            color: #FFD700;
+            margin: 0;
+            font-size: 30px;
+        }
+        .navbar ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+        .navbar ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+        .navbar ul li a:hover {
+            color: #ffd700;
+        }
+        .review-form {
+            margin: 20px 0;
+            background-color: #444;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .review-form input, .review-form textarea, .review-form select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+        }
+        .review-form button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #FFD700;
+            color: black;
+            cursor: pointer;
+        }
+        .reviews-section {
+            margin-top: 30px;
+        }
+        .review-card {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .review-card h3 {
+            color: #FFD700;
+            margin: 0;
+        }
+        .review-card p {
+            color: #ccc;
+        }
+        .rating-stars {
+            color: #FFD700;
+        }
+        #successMessage {
+            color: #FFD700;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>Reviews</h1>
+        <ul>
+            <li><a href="watchlist.html">Watchlist</a></li>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="login.html">Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Review Submission Form -->
+    <section class="review-form">
+        <h2>Submit Your Review</h2>
+        <select id="movieSelect" required>
+            <option value="">Select Movie</option>
+        </select>
+        <input type="text" id="reviewerName" placeholder="Your Name" required />
+        <textarea id="reviewText" placeholder="Write your review..." rows="5" required></textarea>
+        <label for="rating">Rating:</label>
+        <select id="rating" required>
+            <option value="1">1 Star</option>
+            <option value="2">2 Stars</option>
+            <option value="3">3 Stars</option>
+            <option value="4">4 Stars</option>
+            <option value="5">5 Stars</option>
+        </select>
+        <button id="submitButton" onclick="func()">Submit Review</button>
+        <p id="successMessage" style="display:none;">Review submitted successfully!</p>
+    </section>
+
+    <!-- Reviews Section -->
+    <section class="reviews-section">
+        <h2>Movie Reviews</h2>
+        <div id="reviews-container">
+            <!-- Reviews will be dynamically added here -->
+        </div>
+    </section>
+
+    <!-- JavaScript to manage reviews -->
+    <script>
+        const movies = [
+            { title: "Jailer", genre: "Action" },
+            { title: "Viduthalai", genre: "Drama" },
+            { title: "Maamannan", genre: "Thriller" },
+            { title: "Thunivu", genre: "Action" },
+            { title: "Don", genre: "Comedy" },
+            { title: "Varisu", genre: "Drama" },
+            { title: "Sivaji", genre: "Action" },
+            { title: "Kabali", genre: "Drama" },
+            { title: "Petta", genre: "Action" },
+            { title: "Kaithi", genre: "Thriller" },
+            { title: "Master", genre: "Action" },
+            { title: "Vikram", genre: "Action" },
+            { title: "KGF", genre: "Thriller" },
+            { title: "Sulthan", genre: "Drama" },
+        ];
+
+        // Populate movie options in the dropdown
+        const movieSelect = document.getElementById("movieSelect");
+        movies.forEach(movie => {
+            const option = document.createElement("option");
+            option.value = movie.title;
+            option.textContent = movie.title;
+            movieSelect.appendChild(option);
+        });
+        function func(){
+            alert('Thank you for review');
+        }
+        // Function to submit a review
+        function submitReview() {
+            const movie = document.getElementById("movieSelect").value;
+            const name = document.getElementById("reviewerName").value;
+            const reviewText = document.getElementById("reviewText").value;
+            const rating = document.getElementById("rating").value;
+
+            if (!movie || !name || !reviewText || !rating) {
+                alert("Please fill out all fields.");
+                return;
+            }
+
+            const review = {
+                movie,
+                name,
+                reviewText,
+                rating,
+            };
+
+            let reviews = JSON.parse(localStorage.getItem("reviews")) || [];
+            reviews.push(review);
+            localStorage.setItem("reviews", JSON.stringify(reviews));
+
+            displayReviews();
+            document.getElementById("successMessage").style.display = "block"; // Show success message
+            console.log("Review submitted:", review);
+            // Clear form fields after submission
+            clearForm();
+        }
+
+        // Function to display reviews
+        function displayReviews() {
+            const reviewsContainer = document.getElementById("reviews-container");
+            reviewsContainer.innerHTML = ""; // Clear previous reviews
+
+            let reviews = JSON.parse(localStorage.getItem("reviews")) || [];
+
+            reviews.forEach(review => {
+                const reviewCard = `
+                    <div class="review-card">
+                        <h3>${review.movie}</h3>
+                        <p><strong>Reviewer:</strong> ${review.name}</p>
+                        <p><strong>Review:</strong> ${review.reviewText}</p>
+                        <p><strong>Rating:</strong> <span class="rating-stars">${"★".repeat(review.rating)}</span></p>
+                    </div>
+                `;
+                reviewsContainer.innerHTML += reviewCard;
+            });
+        }
+
+        // Function to clear form fields after submission
+        function clearForm() {
+            document.getElementById("movieSelect").selectedIndex = 0;
+            document.getElementById("reviewerName").value = '';
+            document.getElementById("reviewText").value = '';
+            document.getElementById("rating").selectedIndex = 0;
+        }
+
+        // Initial display of reviews
+        displayReviews();
+
+        // Attach event listener to the submit button
+        document.getElementById("submitButton").addEventListener("click", submitReview);
+    </script>
+</body>
+</html>
